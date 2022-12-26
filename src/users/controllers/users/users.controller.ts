@@ -96,6 +96,8 @@ export class UsersController {
     return this.UsersService.createUsers(user);
   }
 
+
+  // SERIALIZED USERS
   @Get("serialized/all")
   getSerializedUser(){
   return this.UsersService.getSerializedUser();
