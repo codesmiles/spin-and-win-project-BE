@@ -9,6 +9,9 @@ import { UsersService } from './services/users/users.service';
 // generate modules nest g module users
 @Module({
   controllers: [UsersController],
-  providers: [UsersService]
+  providers: [{
+    provide: 'USERS_SERVICE',
+    useClass: UsersService,
+  }],
 })
 export class UsersModule {}

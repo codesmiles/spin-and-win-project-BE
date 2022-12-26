@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsEmail, IsNotEmpty, IsNumberString, IsString, ValidateNested } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumberString, IsString, IsStrongPassword, ValidateNested } from "class-validator";
 import CreateAddressDto from "./createAddress.dto";
 
 
@@ -23,4 +23,9 @@ export default class CreateUserDto{
     @ValidateNested()
     @Type(() => CreateAddressDto)
     address:CreateAddressDto;
+
+    @IsNotEmpty()
+    @IsString()
+    @IsStrongPassword()
+    password:string;
 }

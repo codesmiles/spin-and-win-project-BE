@@ -16,16 +16,22 @@ import { res } from 'src/users/types/User';
 import { Request, Response } from 'express';
 import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
 import CreateUserDto from 'src/users/DTOs/createUser.dto';
+import { Inject } from '@nestjs/common/decorators';
 
 @Controller('users')
 export class UsersController {
-  constructor(private UsersService: UsersService) {}
+  // constructor(private UsersService: UsersService) {}
+  constructor(@Inject("USERS_SERVICE") private readonly UsersService:UsersService) {}
 
   @Get('all')
   getAllUsers(): res {
     return this.UsersService.getAll();
   }
 
+  @Get("all/serialized")
+  getSerializedUser(){
+  return this.UsersService.getSerializedUser();
+  }
   /**
    *
    * @param req not used
@@ -77,10 +83,23 @@ export class UsersController {
     } else throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
   }
 
+  @Get('search/name/:name')
+  findUserByName(@Param('name') name: string) {
+    const oneUser = this.UsersService.getUserByName(name);
+    if (oneUser) {
+      return {
+        successful: true,
+        message: 'User found',
+        data: oneUser,
+      };
+    } else throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+  }
   /**
    * 
    * @param user 
    * @returns user created
+   * @body decorator is used to get the body of the request
+   * @UsePipes(ValidationPipe) is used to validate the body of the request
    */
   @Post('create')
   @UsePipes(ValidationPipe)
