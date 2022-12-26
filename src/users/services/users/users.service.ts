@@ -8,7 +8,7 @@ export class UsersService {
    private registeredUsers:User[] = [
     {
       id: 1,
-      name: 'John Doe',
+      name: 'john',
       email: `nomail@mail.com`,
       password:"123"
       
@@ -46,13 +46,11 @@ export class UsersService {
     return this.registeredUsers.find((user) => user.id === id);
   }
 
-  getUserByName(name:string){
-    return this.registeredUsers.find((user) => user.name === name);
-  }
   createUsers(user:CreateUserDto){
+    user.name = user.name.toLowerCase();
     return this.registeredUsers.push(user);
   }
-
+  
   // serialized users
   getSerializedUser(){
     let serializedUser = this.registeredUsers.map(user=>plainToClass(SerializedUser,user))
@@ -62,5 +60,8 @@ export class UsersService {
       data: serializedUser
     };
     
+  }
+  getSeralizedUserByName(name:string){
+    return this.registeredUsers.find((user) => user.name === name);
   }
 }

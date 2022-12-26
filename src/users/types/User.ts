@@ -16,8 +16,12 @@ export class SerializedUser {
     id: number;
     name: string;
     email: string;
-    
+
     @Exclude()
     password: string;
+
+    constructor(partial: Partial<SerializedUser>) {
+        Object.assign(this, partial);
+    }
 
 }

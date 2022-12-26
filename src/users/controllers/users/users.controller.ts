@@ -1,4 +1,5 @@
 import {
+  ClassSerializerInterceptor,
   Controller,
   Get,
   HttpException,
@@ -12,11 +13,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/services/users/users.service';
-import { res } from 'src/users/types/User';
+import { res, SerializedUser } from 'src/users/types/User';
 import { Request, Response } from 'express';
 import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
 import CreateUserDto from 'src/users/DTOs/createUser.dto';
-import { Inject } from '@nestjs/common/decorators';
+import { Inject, UseInterceptors } from '@nestjs/common/decorators';
 
 @Controller('users')
 export class UsersController {
@@ -28,10 +29,7 @@ export class UsersController {
     return this.UsersService.getAll();
   }
 
-  @Get("all/serialized")
-  getSerializedUser(){
-  return this.UsersService.getSerializedUser();
-  }
+
   /**
    *
    * @param req not used
@@ -83,17 +81,7 @@ export class UsersController {
     } else throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
   }
 
-  @Get('search/name/:name')
-  findUserByName(@Param('name') name: string) {
-    const oneUser = this.UsersService.getUserByName(name);
-    if (oneUser) {
-      return {
-        successful: true,
-        message: 'User found',
-        data: oneUser,
-      };
-    } else throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
-  }
+  
   /**
    * 
    * @param user 
@@ -106,5 +94,30 @@ export class UsersController {
   createUser(@Body() user: CreateUserDto) {
     // DTO
     return this.UsersService.createUsers(user);
+  }
+
+  @Get("serialized/all")
+  getSerializedUser(){
+  return this.UsersService.getSerializedUser();
+  }
+
+
+  @UseInterceptors(ClassSerializerInterceptor) //part of the alternative
+
+  @Get('serialized/search/:name')
+  findSerializedUserByName(@Param('name') name: string) {
+    const user = this.UsersService.getSeralizedUserByName(name.toLowerCase());
+  //   if (user) {
+  //     return {
+  //       successful: true,
+  //       message: 'Serialized User found',
+  //       data: oneUser,
+  //     };
+  //   } else throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+  
+  // ALTERNATIVE
+  if(user) return new SerializedUser(user);
+  else return new HttpException({successful:false,message:"User not found"},HttpStatus.BAD_REQUEST)
+
   }
 }
